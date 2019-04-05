@@ -1,0 +1,19 @@
+.title {
+    text-align: center;
+    color: #008080;
+}
+/* 
+table, th, td {
+    border: 1px solid #d6d6d6;
+    border-collapse: collapse;
+    padding: 15px;
+}
+
+h1, h4 {
+    font-family: Arial;
+} */
+
+.rangeslider{
+    margin-left: 10px;
+
+}
