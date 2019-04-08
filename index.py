@@ -1,12 +1,19 @@
 import os
 
 import dash
+import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
 from plotly import tools
 import plotly.plotly as py
 from dash.dependencies import Input, Output, State
-from categoryPlot import dfPokemon, listGoFunc, generateValuePlot, go,generate_table
+
+
+from src.components.dataPokemon import dfPokemon, dfPokemonTable
+from src.components.tab1.view import renderIsiTab1
+from src.components.tab2.view import listGoFunc, generateValuePlot, go #, generate_table
+
+from src.components.tab1.callbacks import callbacksortingtable, callbackfiltertable
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -16,64 +23,14 @@ app = dash.Dash(__name__) # external_stylesheets=external_stylesheets)
 
 server = app.server
 
+
 app.title = 'Dashboard Pokemon'
 
 app.layout = html.Div([
     html.H1('Dashboard Pokemon',style={'color': '#000080'}),
     html.H4('Created by Glen P. Wangsa'),
     dcc.Tabs(id="tabs", value='tab-1', children=[
-        dcc.Tab(label='Data Pokemon', value='tab-1', children=[
-            html.Div([
-                html.Div([
-                    html.P('Name : '),
-                    dcc.Input(id='nameSearch', type='text', value='',style=dict(width='100%'))
-                ], className='col-4'),
-                html.Div([
-                    html.P('Legendary : '),
-                    dcc.Dropdown(
-                        id='legendSearch',
-                        options=[{'label': i, 'value': i} for i in ['All','False','True']],
-                        value='All'
-                    )
-                ], className='col-4'),
-                html.Div([
-                    html.P('Generation : '),
-                    dcc.Dropdown(
-                        id='genSearch',
-                        options=[{'label': i, 'value': i} for i in ['All','1','2','3','4','5','6']],
-                        value='All'
-                    )
-                ], className='col-4')
-            ], className='row'),html.Br(),
-            html.Div([
-                html.Div([
-                    html.P('Total : '),
-                    dcc.RangeSlider(
-                        marks={i: str(i) for i in range(dfPokemon['Total'].min(), dfPokemon['Total'].max()+1, 60)},
-                        min=dfPokemon['Total'].min(),
-                        max=dfPokemon['Total'].max(),
-                        value=[dfPokemon['Total'].min(),dfPokemon['Total'].max()],
-                        className='rangeslider',
-                        id='totalSearch'
-                    ),
-                ], className='col-10'),
-                    html.Div([
-                        html.Br(),
-                        html.Button('Search', id='buttonsearch', style=dict(width='100%'))
-                    ], className='col-2'),
-            ], className = 'row'),html.Br(),html.Br(),
-            html.Div([
-                html.P('Max Row : '),
-                dcc.Input(id='rowMax', value='10', type='number', max=len(dfPokemon))
-            ], className='col-'),
-            html.Center([
-                html.H2('Data Pokemon', className='title')      
-            ])
-            ,
-            html.Center(
-                id='tableData'
-            )
-        ]),
+        dcc.Tab(label='Data Pokemon', value='tab-1', children=renderIsiTab1()),
         dcc.Tab(label='Categorical Plots', value='tab-2', children=[
             html.Div([
                 # DROP DOWN JENIS PLOT
@@ -228,6 +185,30 @@ app.layout = html.Div([
     }
 )
 
+
+# ________________CALLBACK TABLE________________
+
+@app.callback(
+    Output('table-multicol-sorting', "data"),
+    [Input('table-multicol-sorting', "pagination_settings"),
+     Input('table-multicol-sorting', "sorting_settings")])
+def update_sort_paging_table(pagination_settings, sorting_settings):
+    return callbacksortingtable(pagination_settings, sorting_settings)
+
+
+@app.callback(
+    Output(component_id='tableData', component_property='children'),
+    [Input(component_id='buttonsearch', component_property='n_clicks'),
+    Input(component_id='rowMax', component_property='value')],
+    [State(component_id='nameSearch', component_property='value'),
+    State(component_id='legendSearch', component_property='value'),
+    State(component_id='genSearch', component_property='value'),
+    State(component_id='totalSearch', component_property='value')]
+)
+def update_table(n_clicks,maxrows,name,legend,gen,total):
+    return callbackfiltertable(n_clicks,maxrows,name,legend,gen,total)
+
+
 # ________________CALLBACK PLOT________________
 
 @app.callback(
@@ -334,35 +315,6 @@ def update_pie_chart(group):
             margin = {'l' : 160, 'b' : 40, 't' : 40, 'r' : 20}
         )
     )
-
-
-# ________________CALLBACK TABLE________________
-
-@app.callback(
-    Output(component_id='tableData', component_property='children'),
-    [Input(component_id='buttonsearch', component_property='n_clicks'),
-    Input(component_id='rowMax', component_property='value')],
-    [State(component_id='nameSearch', component_property='value'),
-    State(component_id='legendSearch', component_property='value'),
-    State(component_id='genSearch', component_property='value'),
-    State(component_id='totalSearch', component_property='value')]
-)
-
-def update_table(n_clicks,max_rows,name,legend,gen,total):
-    dataframe = dfPokemon[((dfPokemon['Total'] >= total[0]) & (dfPokemon['Total'] <= total[1]))]
-    if(name == ''):
-        df1 = dataframe 
-    else:
-        df1 = dataframe[dataframe['Name'].str.contains(name)]
-    if(legend == 'All'):
-        df2 = df1
-    elif(len(legend) > 3):
-        df2 = df1[df1['Legendary'] == legend]
-    if(gen == 'All'):
-        df3 = df2   
-    else:
-        df3 = df2[df2['Generation'] == int(gen)]
-    return generate_table(df3,max_rows)
 
 # ________________CALLBACK HISTOGRAM________________
 
