@@ -1,12 +1,9 @@
 import os
 
 import dash
-import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
-import plotly.plotly as py
 from dash.dependencies import Input, Output, State
-import plotly.graph_objs as go
 
 from src.components.dataPokemon import dfPokemon, dfPokemonTable
 from src.components.tab1.view import renderIsiTab1
