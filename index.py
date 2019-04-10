@@ -50,7 +50,7 @@ app.layout = html.Div([
     }
 )
 
-# ________________CALLBACK TABLE________________
+# ______________CALLBACK TABLE________________
 @app.callback(
     Output('table-multicol-sorting', "data"),
     [Input('table-multicol-sorting', "pagination_settings"),
@@ -83,7 +83,7 @@ def update_table(n_clicks,maxrows,name,legend,gen,total):
 def update_category_graph(jenisPlot,xPlot,yPlot,stats):
     return callbackupdatecatgraph(jenisPlot,xPlot,yPlot,stats)
 
-# ________________CALLBACK DISABLE STATS________________
+# __________CALLBACK DISABLE STATS_____________
 @app.callback(
     Output(component_id='statsplotcategory', component_property='disabled'),
     [Input(component_id='jenisplotcategory', component_property='value')]
@@ -93,7 +93,7 @@ def update_disable_stats(jenisPlot):
         return False
     return True
 
-# ________________CALLBACK SCATTER PLOT________________
+# ___________CALLBACK SCATTER PLOT_____________
 @app.callback(
     Output(component_id='scatterGraph', component_property='figure'),
     [Input(component_id='hueplotscatter', component_property='value'),
@@ -103,7 +103,6 @@ def update_disable_stats(jenisPlot):
 )
 def update_scatter_plot(hueScatter,xScatter,yScatter):
     return callbackupdatescattergraph(hueScatter,xScatter,yScatter)
-
 
 # ________________CALLBACK PIE CHART________________
 @app.callback(
