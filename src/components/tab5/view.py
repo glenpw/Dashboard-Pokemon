@@ -30,6 +30,7 @@ def renderIsiTab5():
                     )
                 ], className='col-3')  
             ], className='row'),
+            html.Br(),html.Br(),html.Br(),html.Br(),html.Br(),html.Br(),
             dcc.Graph(
                 id='histGraph'
             )
